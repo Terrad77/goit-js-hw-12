@@ -32,7 +32,7 @@
 
 body {
   background: #eae5e5;
-  padding: 24px;
+  padding: 12px;
   
 }
 
@@ -85,12 +85,6 @@ button {
 button:hover {
   background: #6C8CFF;
 }
-.frame-loader {
-  display: flex;
-  justify-content: center;
-}
-
-
 .gallery {
   display: flex;
   /* max-width: 1440px; */
@@ -100,20 +94,25 @@ button:hover {
   flex-wrap: wrap;
   justify-content: center;
   align-items: flex-start;
-  gap: 46px 24px;
+  gap: 24px;
   background: #FFF;
 }
-
-.gallery-item {  
-  /* max-width: calc((100% - 24px*2)/3); */
+.card {
   width: 360px;  
   height: 200px;
-  
 }
+.gallery-item {  
+  /* max-width: calc((100% - 24px*2)/3); */  
+  border-radius: 4px;
+  border: 1px solid #808080;  
+}
+
 .description {
   display: flex;
   gap: 12px;
-  margin-bottom: 20px;  
+  /* margin-bottom: 20px;   */
+  justify-content: center;
+    /* align-items: center; */
 }
 .description p {  
   /* font-size: 12px; */
@@ -158,9 +157,10 @@ span {
   color: #FFF;
 }
 
-/* <div class="wraper">
-<ul class="gallery"></ul>
-</div> */
+/* .frame-loader {
+  display: flex;
+  justify-content: center;
+} */
 .loader {
   width: 64px;
   height: 64px;
@@ -168,8 +168,9 @@ span {
   border-radius: 50%;
   display: block;
   position: relative;
-  top: 0%;
-  /* left: 50%; */
+  bottom: 0%;
+  /* top: 0%; */
+  left: 50%;
   box-sizing: border-box;
   animation: brandRotation 1s linear infinite;
 }
@@ -194,4 +195,14 @@ span {
   100% {
     transform: rotate(360deg)
   }
+}
+.load-more {
+display: flex;
+margin-top: 12px; 
+margin-right: auto;
+margin-left: auto;
+width: auto;
+/* align-items: center; */
+/* justify-content: center; */
+/* display: none; */
 }
