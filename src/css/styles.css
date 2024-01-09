@@ -197,16 +197,21 @@ span {
 
 
 /* --------------  loader text -----------------------*/
+/* .container-loader {
+  display: flex;
+  align-content: center;  
+} */
 
 .loader {
   font-size: 48px;
   color: #FFF;
   display: inline-block;  
   left: 50%;   
-  transform: translate(-50%);
+  transform: translateX(-50%);
   font-family: Arial, Helvetica, sans-serif;
   font-weight: 400;
   position: relative;
+  /* position: absolute; */
 }
 
 .loader:before {
@@ -287,7 +292,4 @@ margin-top: 12px;
 margin-right: auto;
 margin-left: auto;
 width: auto;
-/* align-items: center; */
-/* justify-content: center; */
-/* display: none; */
 }

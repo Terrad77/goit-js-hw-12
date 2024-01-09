@@ -22,38 +22,37 @@ let modal = new simpleLightbox('ul.gallery a', {
 let page = 1; // Початкове значення параметра 'page' повинно бути 1
 const perPage = 40; // кількість зображень per_page
 const loadMoreBtn = document.querySelector('.load-more');
-// Поки в галерії нема зображень, кнопка повинна бути прихована.
-loadMoreBtn.style.display = 'none';
-// global variable for save user input
-let query = '';
+loadMoreBtn.style.display = 'none'; // Поки в галерії нема зображень, кнопка повинна бути прихована.
+let query = ''; // global variable for save user input
+
+// стандартні налаштування axios.defaults
+axios.defaults.baseURL = 'https://pixabay.com'; // базова адреса
+//Axios автоматично додає заголовок із значенням до кожного запиту
+axios.defaults.headers.common['key'] = '41494285-2be0c6d487dc7750955372a82';
 
 form.addEventListener('submit', async event => {
   //скидання завантаження за Default
   event.preventDefault();
-  page = 1; // повернененя початкового значення page, при пошуку за новим ключовим словом
   gallery.innerHTML = ''; //очищення розмітки gallery
+  page = 1; // повернененя початкового значення page, при пошуку за новим ключовим словом
   loadMoreBtn.style.display = 'none'; // Hide Load more button on new search
+
   query = input.value.trim(); // Отримати значення input і видалити зайві пробіли
   // Якщо введено порожній рядок або лише пробіли, нічого не відбувається
   if (query === '') {
     return;
   }
-
   loader.style.display = 'block'; //show loader
   input.value = ''; //reset user input
-
-  // стандартні налаштування axios.defaultsу, (базова адреса)
-  axios.defaults.baseURL = 'https://pixabay.com';
-
   try {
     const response = await axios.get('/api/', {
       params: {
-        key: '41494285-2be0c6d487dc7750955372a82',
+        // key: '41494285-2be0c6d487dc7750955372a82',
         q: query,
         image_type: 'photo',
         orientation: 'horizontal',
         safesearch: true,
-        per_page: perPage,
+        per_page: perPage, // Set numbers of pictures on page
         page: 1, // Set initial number of page
       },
     });
