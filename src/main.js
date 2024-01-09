@@ -11,7 +11,7 @@ const gallery = document.querySelector('.gallery');
 const loader = document.querySelector('.loader');
 loader.style.display = 'none';
 
-//initialize simpleLightbox
+//initialize object of simpleLightbox
 let modal = new simpleLightbox('ul.gallery a', {
   captionDelay: 250,
   captionsData: 'alt',
@@ -28,26 +28,19 @@ loadMoreBtn.style.display = 'none';
 let query = '';
 
 form.addEventListener('submit', async event => {
+  //скидання завантаження за Default
   event.preventDefault();
   page = 1; // повернененя початкового значення page, при пошуку за новим ключовим словом
   gallery.innerHTML = ''; //очищення розмітки gallery
   loadMoreBtn.style.display = 'none'; // Hide Load more button on new search
-  query = input.value.trim(); // Get user input
+  query = input.value.trim(); // Отримати значення input і видалити зайві пробіли
+  // Якщо введено порожній рядок або лише пробіли, нічого не відбувається
+  if (query === '') {
+    return;
+  }
 
-  loader.style.display = 'block';
-  //reset user input
-  input.value = '';
-  //show loader
-  // loader.style.display = 'block';
-
-  // object of URLSearchParams - iterator
-  // const searchParams = new URLSearchParams({
-  //   key: '41494285-2be0c6d487dc7750955372a82',
-  //   q: query,
-  //   image_type: 'photo',
-  //   orientation: 'horizontal',
-  //   safesearch: true,
-  // });
+  loader.style.display = 'block'; //show loader
+  input.value = ''; //reset user input
 
   // стандартні налаштування axios.defaultsу, (базова адреса)
   axios.defaults.baseURL = 'https://pixabay.com';
@@ -61,7 +54,7 @@ form.addEventListener('submit', async event => {
         orientation: 'horizontal',
         safesearch: true,
         per_page: perPage,
-        page: 1, // Set initial page number
+        page: 1, // Set initial number of page
       },
     });
 
@@ -125,8 +118,8 @@ form.addEventListener('submit', async event => {
 
 // Event listener for Load more button
 loadMoreBtn.addEventListener('click', async () => {
+  //show loader
   loader.style.display = 'block';
-
   try {
     const response = await axios.get('/api/', {
       params: {
@@ -136,10 +129,10 @@ loadMoreBtn.addEventListener('click', async () => {
         orientation: 'horizontal',
         safesearch: true,
         per_page: perPage,
-        page: ++page, // Increment page number for next set of images
+        page: ++page, // Increment page number for next group of images
       },
     });
-
+    //hide loader
     loader.style.display = 'none';
     const data = response.data;
 
@@ -148,7 +141,7 @@ loadMoreBtn.addEventListener('click', async () => {
       throw iziToast.show({
         message: "We're sorry, but you've reached the end of search results.",
         theme: 'dark',
-        backgroundColor: '#EF4040',
+        backgroundColor: 'navy',
         titleColor: 'white',
         position: 'topRight',
       });
@@ -178,10 +171,13 @@ loadMoreBtn.addEventListener('click', async () => {
     );
 
     gallery.insertAdjacentHTML('beforeend', imgs);
+
+    // var.1 виклик scrollToNextGroup() в блоці try, після вставки нових елементів в DOM
     scrollToNextGroup();
 
     modal.refresh();
   } catch (error) {
+    // catch — ловить помилку від await, якщо проміс був відхилений.
     loader.style.display = 'none';
     iziToast.error({
       message: error.message,
@@ -192,18 +188,21 @@ loadMoreBtn.addEventListener('click', async () => {
   }
 });
 
-// оголошення функції scrollToNextGroup глобально
+// // Функція для плавної прокрутк
 const scrollToNextGroup = () => {
+  //отримай у коді висоту однієї карточки галереї, використовуючи функцію getBoundingClientRect.
   const firstGalleryItem = document.querySelector('.gallery-item');
   const galleryItemHeight = firstGalleryItem.getBoundingClientRect().height;
 
+  // The method scrolls the document into the window by the specified amount. сінтаксіс: scrollBy(x - coord, y - coord)  або   scrollBy({options});
   window.scrollBy({
-    top: galleryItemHeight * 2,
-    behavior: 'smooth',
+    top: galleryItemHeight * 2, // scroll на дві висоти galleryItemHeight
+    behavior: 'smooth', // Плавна анімація прокрутки
   });
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-  // виклик функції scrollToNextGroup
-  scrollToNextGroup();
-});
+//var.2 виклик функції поза блоком try, після події DOMContentLoaded – DOM готовий,
+//window.addEventListener('load', () => {scrollToNextGroup();});
+
+//var.3 виклик функції поза блоком try, після подіїа window.onload - сторінка повністю завантажена, включаючи усі вкладені ресурси (зображення, стилі, скрипти і т.д.).
+// document.addEventListener('DOMContentLoaded', () => {scrollToNextGroup();});
