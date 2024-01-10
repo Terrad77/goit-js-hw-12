@@ -17,6 +17,15 @@ let modal = new simpleLightbox('ul.gallery a', {
   captionsData: 'alt',
 });
 
+// object of URLSearchParams - iterator
+// const searchParams = new URLSearchParams({
+//   key: '41494285-2be0c6d487dc7750955372a82',
+//   q: query,
+//   image_type: 'photo',
+//   orientation: 'horizontal',
+//   safesearch: true,
+// });
+
 // пангінація
 // Pixabay API підтримує пагінацію та надає параметри page і per_page.
 let page = 1; // Початкове значення параметра 'page' повинно бути 1
@@ -28,7 +37,8 @@ let query = ''; // global variable for save user input
 // стандартні налаштування axios.defaults
 axios.defaults.baseURL = 'https://pixabay.com'; // базова адреса
 //Axios автоматично додає заголовок із значенням до кожного запиту
-axios.defaults.headers.common['key'] = '41494285-2be0c6d487dc7750955372a82';
+// axios.defaults.headers.common['ID'] = '41494285-2be0c6d487dc7750955372a82'; //але Corse не приймає header key - 403 Forbidden
+// const apiKey = '41494285-2be0c6d487dc7750955372a82';
 
 form.addEventListener('submit', async event => {
   //скидання завантаження за Default
@@ -38,7 +48,7 @@ form.addEventListener('submit', async event => {
   loadMoreBtn.style.display = 'none'; // Hide Load more button on new search
 
   query = input.value.trim(); // Отримати значення input і видалити зайві пробіли
-  // Якщо введено порожній рядок або лише пробіли, нічого не відбувається
+  // перевірка на порожній рядок або лише пробіли
   if (query === '') {
     return;
   }
@@ -47,7 +57,7 @@ form.addEventListener('submit', async event => {
   try {
     const response = await axios.get('/api/', {
       params: {
-        // key: '41494285-2be0c6d487dc7750955372a82',
+        key: '41494285-2be0c6d487dc7750955372a82',
         q: query,
         image_type: 'photo',
         orientation: 'horizontal',
@@ -176,7 +186,7 @@ loadMoreBtn.addEventListener('click', async () => {
 
     modal.refresh();
   } catch (error) {
-    // catch — ловить помилку від await, якщо проміс був відхилений.
+    // ловимо помилку від await, якщо проміс був відхилений.
     loader.style.display = 'none';
     iziToast.error({
       message: error.message,
@@ -186,8 +196,7 @@ loadMoreBtn.addEventListener('click', async () => {
     console.error('Error fetching more data:', error);
   }
 });
-
-// // Функція для плавної прокрутк
+// Функція плавної прокрутки
 const scrollToNextGroup = () => {
   //отримай у коді висоту однієї карточки галереї, використовуючи функцію getBoundingClientRect.
   const firstGalleryItem = document.querySelector('.gallery-item');
