@@ -11,60 +11,64 @@ const gallery = document.querySelector('.gallery');
 const loader = document.querySelector('.loader');
 loader.style.display = 'none';
 
-//initialize object of simpleLightbox
+//initialize simpleLightbox
 let modal = new simpleLightbox('ul.gallery a', {
   captionDelay: 250,
   captionsData: 'alt',
 });
 
+// особистий ключ доступу
+const apiKey = '41494285-2be0c6d487dc7750955372a82';
+// global variable for save user input
+let query = '';
+
+// Pixabay API підтримує пагінацію та надає параметри page і per_page.
+let page = 1; // Початкове значення параметра 'page' повинно бути 1
+const perPage = 40; // кількість зображень per_page
+// Поки в галерії нема зображень, кнопка повинна бути прихована.
+const loadMoreBtn = document.querySelector('.load-more');
+loadMoreBtn.style.display = 'none';
+
 // object of URLSearchParams - iterator
 // const searchParams = new URLSearchParams({
-//   key: '41494285-2be0c6d487dc7750955372a82',
+//   key: `${apiKey}`,
 //   q: query,
 //   image_type: 'photo',
 //   orientation: 'horizontal',
 //   safesearch: true,
+// page: `${page}`,
+// per_page: `${perPage}`,
 // });
 
-// пангінація
-// Pixabay API підтримує пагінацію та надає параметри page і per_page.
-let page = 1; // Початкове значення параметра 'page' повинно бути 1
-const perPage = 40; // кількість зображень per_page
-const loadMoreBtn = document.querySelector('.load-more');
-loadMoreBtn.style.display = 'none'; // Поки в галерії нема зображень, кнопка повинна бути прихована.
-let query = ''; // global variable for save user input
-
-// стандартні налаштування axios.defaults
-axios.defaults.baseURL = 'https://pixabay.com'; // базова адреса
-//Axios автоматично додає заголовок із значенням до кожного запиту
-// axios.defaults.headers.common['ID'] = '41494285-2be0c6d487dc7750955372a82'; //але Corse не приймає header key - 403 Forbidden
-// const apiKey = '41494285-2be0c6d487dc7750955372a82';
+// function for update SearchParams
+const getSearchParams = () =>
+  new URLSearchParams({
+    key: apiKey,
+    q: query,
+    image_type: 'photo',
+    orientation: 'horizontal',
+    safesearch: true,
+    page: page,
+    per_page: perPage,
+  });
+// стандартні налаштування axios.defaults базова адреса
+axios.defaults.baseURL = 'https://pixabay.com';
+const url = `/api/`;
 
 form.addEventListener('submit', async event => {
-  //скидання завантаження за Default
   event.preventDefault();
-  gallery.innerHTML = ''; //очищення розмітки gallery
   page = 1; // повернененя початкового значення page, при пошуку за новим ключовим словом
+  gallery.innerHTML = ''; //очищення розмітки gallery
   loadMoreBtn.style.display = 'none'; // Hide Load more button on new search
+  query = input.value.trim(); // Get user input
 
-  query = input.value.trim(); // Отримати значення input і видалити зайві пробіли
-  // перевірка на порожній рядок або лише пробіли
-  if (query === '') {
-    return;
-  }
+  if (query === '') return; // перевірка на порожній рядок або пробіли
   loader.style.display = 'block'; //show loader
   input.value = ''; //reset user input
+
   try {
-    const response = await axios.get('/api/', {
-      params: {
-        key: '41494285-2be0c6d487dc7750955372a82',
-        q: query,
-        image_type: 'photo',
-        orientation: 'horizontal',
-        safesearch: true,
-        per_page: perPage, // Set numbers of pictures on page
-        page: 1, // Set initial number of page
-      },
+    const response = await axios.get(url, {
+      params: getSearchParams(),
     });
 
     loader.style.display = 'none';
@@ -111,8 +115,7 @@ form.addEventListener('submit', async event => {
     if (data.hits.length >= perPage) {
       loadMoreBtn.style.display = 'block';
     }
-
-    //оновлення екземпляра SimpleLightbox кожного разу після додавання нових зображень
+    //Після додавання нових елементів до списку зображень на екземплярі SimpleLightbox викликається метод refresh()
     modal.refresh();
   } catch (error) {
     loader.style.display = 'none';
@@ -127,21 +130,15 @@ form.addEventListener('submit', async event => {
 
 // Event listener for Load more button
 loadMoreBtn.addEventListener('click', async () => {
-  //show loader
   loader.style.display = 'block';
+  // З кожним наступним запитом page необхідно збільшити на 1
+  page = ++page;
+
   try {
-    const response = await axios.get('/api/', {
-      params: {
-        key: '41494285-2be0c6d487dc7750955372a82',
-        q: query,
-        image_type: 'photo',
-        orientation: 'horizontal',
-        safesearch: true,
-        per_page: perPage,
-        page: ++page, // Increment page number for next group of images
-      },
+    const response = await axios.get(url, {
+      params: getSearchParams(),
     });
-    //hide loader
+
     loader.style.display = 'none';
     const data = response.data;
 
@@ -150,7 +147,7 @@ loadMoreBtn.addEventListener('click', async () => {
       throw iziToast.show({
         message: "We're sorry, but you've reached the end of search results.",
         theme: 'dark',
-        backgroundColor: 'navy',
+        backgroundColor: '#EF4040',
         titleColor: 'white',
         position: 'topRight',
       });
@@ -196,21 +193,22 @@ loadMoreBtn.addEventListener('click', async () => {
     console.error('Error fetching more data:', error);
   }
 });
-// Функція плавної прокрутки
+
+//глобальне оголошення функція плавної прокрутки scrollToNextGroup
 const scrollToNextGroup = () => {
-  //отримай у коді висоту однієї карточки галереї, використовуючи функцію getBoundingClientRect.
   const firstGalleryItem = document.querySelector('.gallery-item');
+  //отримай у коді висоту однієї карточки галереї, використовуючи функцію getBoundingClientRect.
   const galleryItemHeight = firstGalleryItem.getBoundingClientRect().height;
 
   // The method scrolls the document into the window by the specified amount. сінтаксіс: scrollBy(x - coord, y - coord)  або   scrollBy({options});
   window.scrollBy({
-    top: galleryItemHeight * 2, // scroll на дві висоти galleryItemHeight
-    behavior: 'smooth', // Плавна анімація прокрутки
+    top: galleryItemHeight * 2,
+    behavior: 'smooth',
   });
 };
 
-//var.2 виклик функції поза блоком try, після події DOMContentLoaded – DOM готовий,
-//window.addEventListener('load', () => {scrollToNextGroup();});
-
-//var.3 виклик функції поза блоком try, після подіїа window.onload - сторінка повністю завантажена, включаючи усі вкладені ресурси (зображення, стилі, скрипти і т.д.).
+//var.2 виклик функції плавної прокрутки поза блоком try, після події DOMContentLoaded – DOM готовий.
 // document.addEventListener('DOMContentLoaded', () => {scrollToNextGroup();});
+
+//var.3 виклик функції плавної прокрутки поза блоком try, після подіїа window.onload - сторінка повністю завантажена, включаючи усі вкладені ресурси (зображення, стилі, скрипти і т.д.).
+//window.addEventListener('load', () => {scrollToNextGroup();});
