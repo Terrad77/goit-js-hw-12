@@ -132,7 +132,7 @@ form.addEventListener('submit', async event => {
 loadMoreBtn.addEventListener('click', async () => {
   loader.style.display = 'block';
   // З кожним наступним запитом page необхідно збільшити на 1
-  page = ++page;
+  page++;
 
   try {
     const response = await axios.get(url, {
@@ -152,7 +152,7 @@ loadMoreBtn.addEventListener('click', async () => {
         position: 'topRight',
       });
     }
-
+    //var.1 using reduce()
     const imgs = data.hits.reduce(
       (
         html,
@@ -175,6 +175,33 @@ loadMoreBtn.addEventListener('click', async () => {
         </li>`,
       ''
     );
+    //var.2 using map().join()
+    // const imgs = data.hits
+    //   .map(
+    //     ({
+    //       webformatURL,
+    //       largeImageURL,
+    //       tags,
+    //       likes,
+    //       views,
+    //       comments,
+    //       downloads,
+    //     }) =>
+    //       `<li class="gallery-item">
+    //   <div class="card">
+    //     <a class="gallery-link" href="${largeImageURL}">
+    //       <img class="gallery-image" src="${webformatURL}" alt="${tags}" />
+    //     </a>
+    //   </div>
+    //   <div class="description">
+    //     <p>Likes:<span>${likes}</span></p>
+    //     <p>Views:<span>${views}</span></p>
+    //     <p>Comments:<span>${comments}</span></p>
+    //     <p>Downloads:<span>${downloads}</span></p>
+    //   </div>
+    // </li>`
+    //   )
+    //   .join('');
 
     gallery.insertAdjacentHTML('beforeend', imgs);
 
