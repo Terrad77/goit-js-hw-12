@@ -18,19 +18,32 @@
     <link rel="stylesheet" href="/goit-js-hw-12/assets/index-383490e2.css">
   </head>
   <body>
+    <!-- Атрибут - name, задает имя для поля ввода HTML формы.
+Полями формы служат теги input, textarea, select.
+Это имя нужно для того, чтобы получить значение поля ввода через язык PHP после отправки формы.
+Если задать одинаковые имена для радио переключателей, то они станут единой группой и только один из них сможет быть отмеченным. -->
     <form class="form">
-      <input id="input" type="text" placeholder="Search images..." />
+      <input
+        id="input"
+        type="text"
+        name="query"
+        placeholder="Search images..."
+      />
       <button type="submit">Search</button>
     </form>
     <div class="wraper">
       <ul class="gallery"></ul>
     </div>
-    <button type="button" class="load-more">Load more</button>
+    <button type="button" class="load-more" data-action="load-more-btn">
+      Load more
+    </button>
     <div class="container-loader">
       <div class="loader"></div>
     </div>
 
     <!-- JS -->
     
+    <!-- <script type="module" src="./main2.js" defer></script> -->
+    <!-- <script type="module" src="./main3.js" defer></script> -->
   </body>
 </html>
